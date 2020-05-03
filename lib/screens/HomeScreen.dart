@@ -1,9 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_open_cart/api/categoryAPI.dart';
 import 'package:flutter_open_cart/api/productLatestAPI.dart';
+import 'package:flutter_open_cart/bloc/product_latest_bloc/product_latest_bloc.dart';
+import 'package:flutter_open_cart/bloc/product_latest_bloc/product_latest_event.dart';
+import 'package:flutter_open_cart/bloc/product_latest_bloc/product_latest_state.dart';
 import 'package:flutter_open_cart/model/categoryModel.dart';
-import 'package:flutter_open_cart/model/product_model.dart';
+import 'package:flutter_open_cart/model/product_latest_model.dart';
 import 'package:flutter_open_cart/shared_ui/navigation_drawer.dart';
 import 'package:flutter_open_cart/utilities/Common.dart';
 import 'package:flutter_open_cart/widgets/header_category.dart';
@@ -17,8 +21,17 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  double scrHeight, scrWidth;
   CategoryAPI categoryAPI = CategoryAPI();
-  ProductLatestAPI productLatestAPI = ProductLatestAPI();
+  //ProductLatestAPI productLatestAPI = ProductLatestAPI();
+  ProductLatestBloc productLatestBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    productLatestBloc = BlocProvider.of<ProductLatestBloc>(context);
+    productLatestBloc.add(FetchProductLatest());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,8 +52,8 @@ class _HomeScreenState extends State<HomeScreen> {
             HeaderCategory(),
             SizedBox(height: 10),
             _drawCategory(),
-            _drawSpecialProducts(),
-            _drawPopularProducts(),
+            _buildProductLatest(),
+          //  _drawPopularProducts(),
           ],
         ),
       ),
@@ -84,63 +97,52 @@ class _HomeScreenState extends State<HomeScreen> {
         });
   }
 
-  Widget _drawSpecialProducts() {
-    return FutureBuilder(
-      future: productLatestAPI.fetchAllLatestProduct(),
+  Widget _buildProductLatest() {
+    return BlocBuilder<ProductLatestBloc,ProductLatestState>(
       // ignore: missing_return
-      builder: (context, AsyncSnapshot snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.none:
-            return connectionError();
-            break;
-          case ConnectionState.waiting:
-            return loading();
-            break;
-          case ConnectionState.active:
-            return loading();
-            break;
-          case ConnectionState.done:
-            if (snapshot.error != null) {
-              return error(snapshot.error);
-            } else {
-              List<ProductModel> latestList = snapshot.data;
-              print(latestList.length);
-              ProductModel productMode1 = snapshot.data[6];
-              ProductModel productMode2 = snapshot.data[8];
-              ProductModel productMode3 = snapshot.data[7];
-              ProductModel productMode4 = snapshot.data[9];
-              return Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    HeaderProduct("Special Products"),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: <Widget>[
-                        SingleProduct(productMode1),
-                        SingleProduct(productMode2),
-                      ],
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: <Widget>[
-                        SingleProduct(productMode3),
-                        SingleProduct(productMode4),
-                      ],
-                    ),
-                  ],
-                ),
-              );
-            }
-            break;
+      builder: (context, state) {
+        if (state is ProductLatestLoading) {
+          return loading();
+        } else if (state is ProductLatestLoaded) {
+          return drawProductLatest(state.products);
+        } else if (state is ProductLatestLoadFailure) {
+          return buildErrorUi(state.message);
         }
       },
+
     );
   }
 
-  Widget _drawPopularProducts() {
+  Widget drawProductLatest(List<ProductLatestModel> products) {
+    return Container(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          HeaderProduct("Special Products"),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              SingleProduct(products[9]),
+              SingleProduct(products[8]),
+            ],
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              SingleProduct(products[7]),
+              SingleProduct(products[6]),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+
+
+  /*Widget _drawPopularProducts() {
     return FutureBuilder(
       future: productLatestAPI.fetchAllLatestProduct(),
       // ignore: missing_return
@@ -194,7 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       },
     );
-  }
+  }*/
 
 
 }

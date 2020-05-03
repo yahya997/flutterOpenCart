@@ -1,8 +1,11 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_open_cart/api/SessionAPI.dart';
+import 'package:flutter_open_cart/repositories/product_repository.dart';
 import 'package:flutter_open_cart/utilities/AppTheme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'api/productLatestAPI.dart';
+import 'bloc/product_latest_bloc/product_latest_bloc.dart';
 import 'screens/HomeScreen.dart';
 import 'screens/Login.dart';
 
@@ -40,13 +43,25 @@ class MyApp extends StatelessWidget {
 
   MyApp(this._screen);
 
+  final ProductRepository productRepository = ProductRepository(
+    productLatestAPI: ProductLatestAPI(),
+  );
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.appTheme,
-      home: _screen,
+      home: MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (context) => ProductLatestBloc(
+                productRepository: productRepository
+              ),
+            ),
+          ],
+          child: _screen),
     );
   }
 }

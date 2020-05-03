@@ -1,7 +1,4 @@
-import 'dart:math';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_open_cart/model/product_model.dart';
+/*
 
 class DetailsProduct extends StatefulWidget {
 
@@ -135,4 +132,4 @@ class _DetailsProductState extends State<DetailsProduct> {
       ),
     );
   }
-}
+}*/

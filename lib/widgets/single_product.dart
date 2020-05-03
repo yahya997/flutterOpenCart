@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_open_cart/model/product_model.dart';
+import 'package:flutter_open_cart/model/product_latest_model.dart';
 import 'package:flutter_open_cart/screens/detailsProduct.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class SingleProduct extends StatefulWidget {
-  ProductModel productModel;
+  ProductLatestModel productModel;
 
   SingleProduct(this.productModel);
 
@@ -20,10 +20,10 @@ class _SingleProductState extends State<SingleProduct> {
       height: 220,
       padding: const EdgeInsets.all(8),
       child: GestureDetector(
-        onTap: () {
+        onTap: () {/*
           Navigator.push(context, MaterialPageRoute(builder: (context) {
             return DetailsProduct(widget.productModel);
-          }));
+          }));*/
         },
         child: Card(
           elevation: 5,
@@ -34,7 +34,7 @@ class _SingleProductState extends State<SingleProduct> {
                 children: <Widget>[
                   Container(
                     child: Image.network(
-                      widget.productModel.thumb,
+                      widget.productModel.thumb.toString(),
                       fit: BoxFit.cover,
                     ),
                     width: 150,
@@ -62,14 +62,14 @@ class _SingleProductState extends State<SingleProduct> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
                   Text(
-                    widget.productModel.price,
+                    widget.productModel.price.toString(),
                     maxLines: 1,
                     style: TextStyle(color: Colors.blue),
                   ),
                   RatingBar(
                     ignoreGestures: true,
                     itemSize: 15,
-                    initialRating: double.parse(widget.productModel.rating),
+                    initialRating: widget.productModel.price.toDouble(),
                     minRating: 1,
                     direction: Axis.horizontal,
                     allowHalfRating: true,

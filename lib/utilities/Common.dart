@@ -32,3 +32,14 @@ Widget loading() {
 }
 
 
+// build Error UI
+Widget buildErrorUi(String message) {
+  return Center(
+    child: Text(
+      message,
+      style: TextStyle(color: Colors.red),
+    ),
+  );
+}
+
+
